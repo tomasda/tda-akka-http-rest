@@ -8,13 +8,15 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import tda.core.apirest.domain.UserProfileUpdate
 import tda.core.apirest.domain.profiles.UserProfileService
+import tda.core.apirest.session.SessionController
 import tda.core.apirest.utils.SecurityDirectives
 
 import scala.concurrent.ExecutionContext
 
 class ProfileRoute(
-    secretKey: String,
-    usersService: UserProfileService
+                    secretKey: String,
+                    sessionStorage: SessionController,
+                    usersService: UserProfileService
 )(implicit executionContext: ExecutionContext)
     extends FailFastCirceSupport {
 
@@ -25,45 +27,74 @@ class ProfileRoute(
   val route: Route = pathPrefix("profiles") {
     pathEndOrSingleSlash {
       get {
-        complete(getProfiles().map(_.asJson))
+        complete(getProfiles.map(_.asJson))
       }
-    } ~
-    pathPrefix("me") {
-      pathEndOrSingleSlash {
-        authenticate(secretKey) { userId =>
-          get {
-            complete(getProfile(userId))
-          } ~
-          post {
-            entity(as[UserProfileUpdate]) { userUpdate =>
-              complete(updateProfile(userId, userUpdate).map(_.asJson))
+    }
+    path("get"){
+      pathEndOrSingleSlash{
+        authenticate(secretKey){
+          id =>
+            get {
+              complete(getProfile(id).map {
+                            case Some(profile) =>
+                              OK -> profile.asJson
+                            case None =>
+                              BadRequest -> None.asJson
+                          })
             }
-          }
-        }
-      }
-    } ~
-    pathPrefix(Segment) { id =>
-      pathEndOrSingleSlash {
-        get {
-          complete(getProfile(id).map {
-            case Some(profile) =>
-              OK -> profile.asJson
-            case None =>
-              BadRequest -> None.asJson
-          })
-        } ~
-        post {
-          entity(as[UserProfileUpdate]) { userUpdate =>
-            complete(updateProfile(id, userUpdate).map {
-              case Some(profile) =>
-                OK -> profile.asJson
-              case None =>
-                BadRequest -> None.asJson
-            })
-          }
         }
       }
     }
+//    pathPrefix("get") {
+//      pathEndOrSingleSlash {
+//        authenticate(secretKey) { userId =>
+//          get {
+//            complete(getProfile(userId))
+//          } ~
+//            post {
+//              entity(as[UserProfileUpdate]) { userUpdate =>
+//                complete(updateProfile(userId, userUpdate).map(_.asJson))
+//              }
+//            }
+//        }
+//      }
+//    } ~
+//    pathPrefix("me") {
+//      pathEndOrSingleSlash {
+//        authenticate(secretKey) { userId =>
+//          get {
+//            complete(getProfile(userId))
+//          } ~
+//          post {
+//            entity(as[UserProfileUpdate]) { userUpdate =>
+//              complete(updateProfile(userId, userUpdate).map(_.asJson))
+//            }
+//          }
+//        }
+//      }
+//    } ~
+//    pathPrefix(Segment) { id =>
+//      pathEndOrSingleSlash {
+//        get {
+//          complete(getProfile(id).map {
+//            case Some(profile) =>
+//              OK -> profile.asJson
+//            case None =>
+//              BadRequest -> None.asJson
+//          })
+//        } ~
+//        post {
+//          entity(as[UserProfileUpdate]) { userUpdate =>
+//            complete(updateProfile(id, userUpdate).map {
+//              case Some(profile) =>
+//                OK -> profile.asJson
+//              case None =>
+//                BadRequest -> None.asJson
+//            })
+//          }
+//        }
+//      }
+//    }
   }
 
 }

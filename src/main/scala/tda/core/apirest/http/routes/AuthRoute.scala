@@ -7,10 +7,11 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
 import io.circe.syntax._
 import tda.core.apirest.domain.auth.AuthService
+import tda.core.apirest.session.SessionController
 
 import scala.concurrent.ExecutionContext
 
-class AuthRoute(authService: AuthService)(implicit executionContext: ExecutionContext) extends FailFastCirceSupport {
+class AuthRoute(sessionStorage:SessionController, authService: AuthService)(implicit executionContext: ExecutionContext) extends FailFastCirceSupport {
 
   import StatusCodes._
   import authService._

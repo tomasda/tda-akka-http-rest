@@ -13,14 +13,17 @@ package object domain {
     require(password.nonEmpty, "password.empty")
   }
 
-  final case class UserProfile(id: UserId, firstName: String, lastName: String) {
+  final case class UserProfile(id: UserId, firstName: String, lastName: String, identity: String) {
     require(id.nonEmpty, "firstName.empty")
     require(firstName.nonEmpty, "firstName.empty")
     require(lastName.nonEmpty, "lastName.empty")
+    require(identity.nonEmpty, "identity.empty")
   }
 
-  final case class UserProfileUpdate(firstName: Option[String] = None, lastName: Option[String] = None) {
+  final case class UserProfileUpdate(firstName: Option[String] = None, lastName: Option[String] = None
+                                     , identity: Option[String] = None) {
     def merge(profile: UserProfile): UserProfile =
-      UserProfile(profile.id, firstName.getOrElse(profile.firstName), lastName.getOrElse(profile.lastName))
+      UserProfile(profile.id, firstName.getOrElse(profile.firstName), lastName.getOrElse(profile.lastName)
+        , identity.getOrElse(profile.identity))
   }
 }

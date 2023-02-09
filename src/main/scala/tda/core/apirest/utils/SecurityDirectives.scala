@@ -1,17 +1,16 @@
 package tda.core.apirest.utils
 
+
+import akka.http.javadsl.server.Directives.reject
 import akka.http.scaladsl.server.Directive1
-import akka.http.scaladsl.server.directives.{BasicDirectives, HeaderDirectives, RouteDirectives}
+import io.circe.jawn.decode
 import pdi.jwt._
-import io.circe.parser._
-import io.circe.generic.auto._
 import tda.core.apirest.domain.{AuthTokenContent, UserId}
 
 object SecurityDirectives {
 
-  import BasicDirectives._
-  import HeaderDirectives._
-  import RouteDirectives._
+  import akka.http.scaladsl.server.directives.BasicDirectives._
+  import akka.http.scaladsl.server.directives.HeaderDirectives._
 
   def authenticate(secretKey: String): Directive1[UserId] =
     headerValueByName("Token")
@@ -25,3 +24,5 @@ object SecurityDirectives {
       }
 
 }
+
+

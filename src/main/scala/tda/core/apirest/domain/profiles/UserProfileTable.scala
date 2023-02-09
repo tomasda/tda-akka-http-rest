@@ -12,10 +12,12 @@ private[profiles] trait UserProfileTable {
     def id        = column[String]("id", O.PrimaryKey)
     def firstName = column[String]("first_name")
     def lastName  = column[String]("last_name")
+    def identity  = column[String]("identity")
 
-    def * = (id, firstName, lastName) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
+    def * = (id, firstName, lastName, identity) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
   }
 
-  protected val profiles = TableQuery[Profiles]
+  protected val
+  profiles = TableQuery[Profiles]
 
 }

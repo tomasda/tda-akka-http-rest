@@ -84,7 +84,7 @@ class UserProfileServiceTest extends BaseServiceTest {
     val testProfile1: UserProfile = testProfile(testProfileId1)
     val testProfile2: UserProfile = testProfile(testProfileId2)
 
-    def testProfile(id: String) = UserProfile(id, Random.nextString(10), Random.nextString(10))
+    def testProfile(id: String) = UserProfile(id, Random.nextString(10), Random.nextString(10), Random.nextString(10))
   }
 
 }

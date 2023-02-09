@@ -1,22 +1,24 @@
 package tda.core.apirest.domain.profiles
 
 import tda.core.apirest.domain.UserProfile
+import tda.core.apirest.session.SessionController
 import tda.core.apirest.utils.db.DatabaseConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
 sealed trait UserProfileStorage {
 
-  def getProfiles(): Future[Seq[UserProfile]]
+  def getProfiles: Future[Seq[UserProfile]]
 
   def getProfile(id: String): Future[Option[UserProfile]]
+  //def getProfile(token: String): Future[Option[UserProfile]]
 
   def saveProfile(profile: UserProfile): Future[UserProfile]
 
 }
 
 class JdbcUserProfileStorage(
-    val databaseConnector: DatabaseConnector
+    val databaseConnector: DatabaseConnector, val sessionController:SessionController
 )(implicit executionContext: ExecutionContext)
     extends UserProfileTable
     with UserProfileStorage {
@@ -24,9 +26,13 @@ class JdbcUserProfileStorage(
   import databaseConnector._
   import databaseConnector.profile.api._
 
-  def getProfiles(): Future[Seq[UserProfile]] = db.run(profiles.result)
+  def getProfiles: Future[Seq[UserProfile]] = db.run(profiles.result)
 
   def getProfile(id: String): Future[Option[UserProfile]] = db.run(profiles.filter(_.id === id).result.headOption)
+//  def getProfile(token: String): Future[Option[UserProfile]] = {
+//    val id = sessionController.getUserIdByToken(token)
+//    db.run(profiles.filter(_.id === id).result.headOption)
+//  }
 
   def saveProfile(profile: UserProfile): Future[UserProfile] =
     db.run(profiles.insertOrUpdate(profile)).map(_ => profile)
@@ -37,7 +43,7 @@ class InMemoryUserProfileStorage extends UserProfileStorage {
 
   private var state: Seq[UserProfile] = Nil
 
-  override def getProfiles(): Future[Seq[UserProfile]] =
+  override def getProfiles: Future[Seq[UserProfile]] =
     Future.successful(state)
 
   override def getProfile(id: String): Future[Option[UserProfile]] =

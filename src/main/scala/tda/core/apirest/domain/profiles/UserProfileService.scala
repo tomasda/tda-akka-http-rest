@@ -9,11 +9,13 @@ class UserProfileService(
     userProfileStorage: UserProfileStorage
 )(implicit executionContext: ExecutionContext) {
 
-  def getProfiles(): Future[Seq[UserProfile]] =
-    userProfileStorage.getProfiles()
+  def getProfiles: Future[Seq[UserProfile]] =
+    userProfileStorage.getProfiles
 
   def getProfile(id: String): Future[Option[UserProfile]] =
     userProfileStorage.getProfile(id)
+//  def getProfile(token: String): Future[Option[UserProfile]] =
+//    userProfileStorage.getProfile(token)
 
   def createProfile(profile: UserProfile): Future[UserProfile] =
     userProfileStorage.saveProfile(profile)
